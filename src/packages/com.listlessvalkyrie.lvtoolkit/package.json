@@ -1,0 +1,7 @@
+{
+  "name": "com.listlessvalkyrie.lvtoolkit",
+  "version": "1.0.0",
+  "displayName": "LV Toolkit",
+  "description": "Useful Unity helper classes and functions.",
+  "unity": "6000.0"
+}
