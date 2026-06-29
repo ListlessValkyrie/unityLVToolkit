@@ -1,37 +1,40 @@
 using UnityEngine;
 
-public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+namespace LVToolkit
 {
-    private static T _instance;
-
-    public static T Instance
+    public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindFirstObjectByType<T>();
+        private static T _instance;
 
+        public static T Instance
+        {
+            get
+            {
                 if (_instance == null)
                 {
-                    var obj = new GameObject(typeof(T).Name);
-                    _instance = obj.AddComponent<T>();
+                    _instance = FindFirstObjectByType<T>();
+
+                    if (_instance == null)
+                    {
+                        var obj = new GameObject(typeof(T).Name);
+                        _instance = obj.AddComponent<T>();
+                    }
                 }
+
+                return _instance;
+            }
+        }
+
+        protected virtual void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(gameObject);
+                return;
             }
 
-            return _instance;
+            _instance = this as T;
+            DontDestroyOnLoad(gameObject);
         }
-    }
-
-    protected virtual void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        _instance = this as T;
-        DontDestroyOnLoad(gameObject);
     }
 }
