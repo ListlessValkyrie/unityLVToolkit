@@ -7,6 +7,9 @@ public class PlayerController : MonoBehaviour
     private float moveSpeed = 2f;
 
     [SerializeField]
+    private float jumpForce = 5f;
+
+    [SerializeField]
     private float sprintMultiplier = 1.5f;
 
     [SerializeField] 
@@ -21,10 +24,28 @@ public class PlayerController : MonoBehaviour
 
     private bool isSprinting = false;
 
+    private bool isGrounded = false;
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag(LVTags.GROUND))
+            isGrounded = true;
+    }
+
     private void Awake()
     {
-        rigidbody = GetComponentInChildren<Rigidbody>();
+        rigidbody = GetComponent<Rigidbody>();
+
+        if (rigidbody == null)        
+            throw new MissingComponentException("PlayerController requires a Rigidbody.");
+
         rigidbody.freezeRotation = true;
+    }
+
+    private void Start()
+    {
+        // Do a jump to reset physics.
+        rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
 
     public void OnSprint(InputAction.CallbackContext context)
@@ -41,9 +62,10 @@ public class PlayerController : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && isGrounded)
         {
             Debug.Log("Jumping");
+            rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
 
