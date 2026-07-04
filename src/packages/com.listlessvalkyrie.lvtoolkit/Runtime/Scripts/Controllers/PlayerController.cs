@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerController : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 moveInput = Vector2.zero;
 
-    private Rigidbody rigidbody;
+    private Rigidbody rigidBody;
 
     private bool isSprinting = false;
 
@@ -34,18 +35,18 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        rigidbody = GetComponent<Rigidbody>();
+        rigidBody = GetComponent<Rigidbody>();
 
-        if (rigidbody == null)        
+        if (rigidBody == null)        
             throw new MissingComponentException("PlayerController requires a Rigidbody.");
 
-        rigidbody.freezeRotation = true;
+        rigidBody.freezeRotation = true;
     }
 
     private void Start()
     {
         // Do a jump to reset physics.
-        rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
 
     public void OnSprint(InputAction.CallbackContext context)
@@ -65,7 +66,8 @@ public class PlayerController : MonoBehaviour
         if (context.performed && isGrounded)
         {
             Debug.Log("Jumping");
-            rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isGrounded = false;
         }
     }
 
@@ -73,12 +75,12 @@ public class PlayerController : MonoBehaviour
     {
         float currentMoveSpeed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed;
 
-        Vector3 targetVelocity = new(moveInput.x * currentMoveSpeed, rigidbody.linearVelocity.y, moveInput.y * currentMoveSpeed);
+        Vector3 targetVelocity = new(moveInput.x * currentMoveSpeed, rigidBody.linearVelocity.y, moveInput.y * currentMoveSpeed);
 
         float rate = moveInput.sqrMagnitude > 0.01f ? acceleration : deceleration;
 
-        rigidbody.linearVelocity = Vector3.MoveTowards(
-            rigidbody.linearVelocity,
+        rigidBody.linearVelocity = Vector3.MoveTowards(
+            rigidBody.linearVelocity,
             targetVelocity,
             rate * Time.fixedDeltaTime);
     }
